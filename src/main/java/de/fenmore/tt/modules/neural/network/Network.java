@@ -22,10 +22,10 @@ public class Network {
         for (int i = 0; i < nodeCounts.length; i++) {
 
             if (i != 0) {
-                weights = new Weights(nodeCounts[i - 1], nodeCounts[i]);
+                weights = new Weights(nodeCounts[i - 1] + 1, nodeCounts[i]); // + 1 for the bias
             }
 
-            this.layers.add(new Layer(nodeCounts[i], weights));
+            this.layers.add(new Layer(nodeCounts[i] + 1, weights)); // + 1 for the bias
         }
         this.epsilon = epsilon;
         this.stdDeviation = stdDeviation;
@@ -61,7 +61,7 @@ public class Network {
             Layer lastLayer = layers.get(l - 1);
             Layer nextLayer = layers.get(l);
 
-            for (int h = 0; h < nextLayer.size(); h++) {
+            for (int h = 0; h < nextLayer.size() - 1; h++) { // - 1 to exclude the bias
                 double a = 0.0;
                 for (int i = 0; i < lastLayer.size(); i++) {
                     a += (nextLayer.getIncomingWeights().get(i, h) * lastLayer.get(i));
@@ -88,13 +88,13 @@ public class Network {
         int len = example.length;
         for (double[] anExample : example) {
 
-            double[] d = new double[layers.get(layers.size() - 1).size()];
+            double[] d = new double[layers.get(layers.size() - 1).size() - 1]; // - 1 to exclude the bias
 
-            for (int i = 0; i < layers.get(0).size(); i++) {
+            for (int i = 0; i < layers.get(0).size() - 1; i++) { // - 1 to exclude the bias
                 layers.get(0).set(i, anExample[i]);
             }
-            for (int i = 0; i < layers.get(layers.size() - 1).size(); i++) {
-                d[i] = anExample[layers.get(0).size() + i];
+            for (int i = 0; i < layers.get(layers.size() - 1).size() - 1; i++) { // - 1 to exclude the bias
+                d[i] = anExample[layers.get(0).size() - 1 + i]; // - 1 cause the bias is not included in the examples
             }
 
             execute();
@@ -132,15 +132,19 @@ public class Network {
             lastHiddenError = Arrays.copyOf(nextHiddenError, nextHiddenError.length);
             nextHiddenError = new double[nextLayer.size()];
             Weights weights = layer.getIncomingWeights();
-            for (int j = 0; j < layer.size(); j++) {
+            for (int j = 0; j < layer.size() - 1; j++) {
 
-                double delta = Math.abs(d[j] - layer.get(j));
-                if (delta > maxErrorNet) maxErrorNet = delta;
-                if (delta < minErrorNet) minErrorNet = delta;
+                double delta;
+                if (l == layers.size() - 1) {
+                    delta = Math.abs(d[j] - layer.get(j));
+                    if (delta > maxErrorNet) maxErrorNet = delta;
+                    if (delta < minErrorNet) minErrorNet = delta;
 
-                delta = (l == layers.size() - 1)
-                        ? (d[j] - layer.get(j)) * layer.get(j) * (1.0 - layer.get(j))
-                        : lastHiddenError[j] * layer.get(j) * (1.0 - layer.get(j));
+                    delta = (d[j] - layer.get(j)) * layer.get(j) * (1.0 - layer.get(j));
+                }
+                else {
+                    delta = lastHiddenError[j] * layer.get(j) * (1.0 - layer.get(j));
+                }
 
                 for (int k = 0; k < nextLayer.size(); k++) {
                     nextHiddenError[k] += delta * weights.get(k, j);
