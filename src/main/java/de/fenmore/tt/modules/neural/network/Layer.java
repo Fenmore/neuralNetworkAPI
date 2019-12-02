@@ -5,8 +5,8 @@ public class Layer {
     private double[] nodes;
     private Weights weightsIncoming;
 
-    public Layer(int valueCount, Weights weightsIncoming) {
-        nodes = new double[valueCount];
+    public Layer(int nodeCount, Weights weightsIncoming) {
+        nodes = new double[nodeCount];
         this.weightsIncoming = weightsIncoming;
     }
 
@@ -22,7 +22,7 @@ public class Layer {
         return weightsIncoming;
     }
 
-    public void set(int pos, double value) {
-        nodes[pos] = value;
+    public void set(int pos, double nodeValue) {
+        nodes[pos] = nodeValue;
     }
 }
