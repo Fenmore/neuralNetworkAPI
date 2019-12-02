@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represents the neural network. It works with basic back propagation and biases.
+ * @author Tobias Thirolf
+ */
 public class Network {
 
     private List<Layer> layers;
@@ -16,6 +20,16 @@ public class Network {
     private double stdDeviationError;
     private double epsilon;
 
+    /**
+     * Creates a new neural network.
+     * @param nodeCounts The count of nodes for each layer. Position 0 represents the input layer, the
+     *                   last position represents the output layer.
+     * @param epsilon The learning value. It's commonly between 0.1 and 0.0001. Note that bigger values
+     *                may lead to "overstep" the perfect value for a weight. Smaller values require more
+     *                learn steps to get to the perfect weight value. The value should not be negative.
+     * @param stdDeviation States whether the standard deviation of the network error should be calculated.
+     *                     See {@link #learn(double[][])}.
+     */
     public Network(int[] nodeCounts, double epsilon, boolean stdDeviation) {
         this.layers = new ArrayList<>();
         Weights weights = null;
@@ -32,26 +46,50 @@ public class Network {
         this.stdDeviation = stdDeviation;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getMaxError() {
         return maxError;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getMinError() {
         return minError;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getAverageError() {
         return averageError;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getStdDeviationError() {
         return stdDeviationError;
     }
 
+    /**
+     *
+     * @param stdDeviation
+     */
     public void setStdDeviation(boolean stdDeviation) {
         this.stdDeviation = stdDeviation;
     }
 
+    /**
+     *
+     * @param epsilon
+     */
     public void setEpsilon(double epsilon) {
         this.epsilon = epsilon;
     }
@@ -77,7 +115,17 @@ public class Network {
         return (1.0 / (1.0 + Math.exp(-a)));
     }
 
-    public void learning(double[][] example) {
+    /**
+     * Trains the network with given examples. Values for {@link #getAverageError()}, {@link #getMaxError()},
+     * {@link #getMinError()}, {@link #getStdDeviationError()} will be updated here. The preparations of the
+     * standard deviation are calculated after each example, the standard deviation itself at the end of this
+     * method.
+     * @param examples Each double[] within "examples" represents an example containing the input information
+     *                 and expected outputs. Outputs have to be placed after the inputs. The length of input
+     *                 and output information have to be the same as specified in
+     *                 {@link #Network(int[], double, boolean)}.
+     */
+    public void learn(double[][] examples) {
 
         maxError = Double.MIN_VALUE;
         minError = Double.MAX_VALUE;
@@ -86,8 +134,8 @@ public class Network {
         double summXQ = 0.0;
         double summXi = 0.0;
 
-        int len = example.length;
-        for (double[] anExample : example) {
+        int len = examples.length;
+        for (double[] anExample : examples) {
 
             double[] d = new double[layers.get(layers.size() - 1).size() - 1]; // - 1 to exclude the bias
 
@@ -95,7 +143,7 @@ public class Network {
                 layers.get(0).set(i, anExample[i]);
             }
             for (int i = 0; i < layers.get(layers.size() - 1).size() - 1; i++) { // - 1 to exclude the bias
-                d[i] = anExample[layers.get(0).size() - 1 + i]; // - 1 cause the bias is not included in the examples
+                d[i] = anExample[layers.get(0).size() - 1 + i]; // - 1 cause the bias is not part of the examples
             }
 
             execute();
@@ -155,9 +203,18 @@ public class Network {
         }
     }
 
+    /**
+     * Executes the current network stance to get the output for a given input.
+     * @param input The values given as input. Giving less values than specified in
+     *              {@link #Network(int[], double, boolean)} for the input layer will lead to a
+     *              {@link IndexOutOfBoundsException}. Values which exceed the specified input
+     *              layer node count will be ignored.
+     * @return The values of the output layer after executing the network. The value count equals
+     *          the specified count in {@link #Network(int[], double, boolean)} for the output layer.
+     */
     public double[] execute(double[] input) {
 
-        for (int i = 0; i < input.length; i++) {
+        for (int i = 0; i < layers.get(0).size() - 1; i++) {
             layers.get(0).set(i, input[i]);
         }
 
