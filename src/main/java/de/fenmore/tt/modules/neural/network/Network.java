@@ -154,4 +154,21 @@ public class Network {
             }
         }
     }
+
+    public double[] execute(double[] input) {
+
+        for (int i = 0; i < input.length; i++) {
+            layers.get(0).set(i, input[i]);
+        }
+
+        execute();
+
+        Layer outputLayer = layers.get(layers.size() - 1);
+        double[] output = new double[outputLayer.size() - 1]; // -1 to exclude the bias
+        for (int i = 0; i < output.length; i++) {
+            output[i] = outputLayer.get(i);
+        }
+
+        return output;
+    }
 }
