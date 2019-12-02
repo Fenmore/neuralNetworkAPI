@@ -26,6 +26,7 @@ public class Network {
             }
 
             this.layers.add(new Layer(nodeCounts[i] + 1, weights)); // + 1 for the bias
+            this.layers.get(i).set(nodeCounts[i], 1); //Initializes the bias
         }
         this.epsilon = epsilon;
         this.stdDeviation = stdDeviation;
