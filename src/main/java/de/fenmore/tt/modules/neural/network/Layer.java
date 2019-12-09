@@ -25,4 +25,8 @@ public class Layer {
     public void set(int pos, double nodeValue) {
         nodes[pos] = nodeValue;
     }
+
+    public double[] getNodes() {
+        return nodes;
+    }
 }

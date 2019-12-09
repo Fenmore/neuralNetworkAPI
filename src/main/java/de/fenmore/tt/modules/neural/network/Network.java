@@ -80,6 +80,14 @@ public class Network {
 
     /**
      *
+     * @return
+     */
+    public double[] getOutput() {
+        return layers.get(layers.size() - 1).getNodes();
+    }
+
+    /**
+     *
      * @param stdDeviation
      */
     public void setStdDeviation(boolean stdDeviation) {
