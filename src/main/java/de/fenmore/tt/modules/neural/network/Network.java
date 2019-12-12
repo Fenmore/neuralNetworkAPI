@@ -88,6 +88,14 @@ public class Network {
 
     /**
      *
+     * @return
+     */
+    public List<Layer> getLayers() {
+        return layers;
+    }
+
+    /**
+     *
      * @param stdDeviation
      */
     public void setStdDeviation(boolean stdDeviation) {
